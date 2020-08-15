@@ -72,7 +72,7 @@ The below task focuses on the drivers of motor vehicles.
 Output: data_s4.csv
 
 ### Modelling script
-**src/analysis/s5_bn_acc.R**
+* **src/analysis/s5_bn_acc.R**
 
 1. Takes 235,901 motor-vehicle drivers’ crash records as input, the script produces the interdependence of crash factors.
 
@@ -82,13 +82,13 @@ Output: data_s4.csv
 ### Presentation scripts
 Visualisation scripts are stored in src/visualisation. Their outputs are stored in figures/.
 
-**plot_crash_map.R**
+* **plot_crash_map.R**
 
 crash_map.png
 
 Crash distribution in Shenzhen 
 
-**plot_crash_by_time.R**
+* **plot_crash_by_time.R**
 
 1. crash_time.png
 
@@ -97,13 +97,13 @@ Temporal patterns of crash occurrence. (a) Month of year; (b) Day of week; (c) T
 2. crash_day_x_hour.png
 The crash occurrence patterns across time of day and day of week.
 
-**plot_land-use_pattern_map.R**
+* **plot_land-use_pattern_map.R**
 
 land-use_map.png
 
 Land-use pattern of Shenzhen. (a) Land-use cluster (LUC) of where crashes happened during 2014-2016.
 
-**plot_crash_causation.R**
+* **plot_crash_causation.R**
 
 crash_causation_bn.png as figure (c) of bn.tiff
 
