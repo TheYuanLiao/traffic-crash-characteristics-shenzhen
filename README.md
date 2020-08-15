@@ -79,7 +79,7 @@ Output: data_s4.csv
 2. Visualises the network structure by figures/bn.tiff about The interdependence between crash factors. (a) Network structure. (b) A highlighted part of crash causation. 
 
 
-### Presentation script
+### Presentation scripts
 Visualisation scripts are stored in src/visualisation. Their outputs are stored in figures/.
 
 **plot_crash_map.R**
