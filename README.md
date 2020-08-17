@@ -80,7 +80,7 @@ Output: data_s4.csv
 
 
 ### Presentation scripts
-Visualisation scripts are stored in src/visualisation. Their outputs are stored in figures/.
+Presentation scripts are stored in src/visualisation. Their outputs are stored in figures/.
 
 * **plot_crash_map.R**
 
@@ -95,6 +95,7 @@ Crash distribution in Shenzhen
 Temporal patterns of crash occurrence. (a) Month of year; (b) Day of week; (c) Time of day.
 
 2. crash_day_x_hour.png
+
 The crash occurrence patterns across time of day and day of week.
 
 * **plot_land-use_pattern_map.R**
@@ -103,8 +104,8 @@ land-use_map.png
 
 Land-use pattern of Shenzhen. (a) Land-use cluster (LUC) of where crashes happened during 2014-2016.
 
-* **plot_crash_causation.R**
+* **plot_crash_causation_9_bn.R**
 
-crash_causation_bn.png as figure (c) of bn.tiff
+crash_causation_9_bn.png as figure (c) of bn.tiff
 
-Conditional probability of crash causation on crash type and the responsibility of motor-vehicle drivers.
+Conditional probability of crash causation (=CC9) on crash type and the responsibility of motor-vehicle drivers.
