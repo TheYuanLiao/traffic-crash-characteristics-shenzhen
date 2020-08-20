@@ -56,29 +56,27 @@ colnames(hour) <- c("var_level", "Crash_min", "Crash_max", "Crash_m")
 hour_day <- with(df, table(Day, Hour))
 hour_day <- data.frame(hour_day)
 
-# Define color
-
 # Plot crash by day
 g1 <- ggplot(day, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2, color='coral') +
-  geom_line(size=1, color='coral') +
+  geom_point(size=2) +
+  geom_line(size=1) +
   labs(x = "Day of week", y = "# of crashes") +
   geom_ribbon(data = day, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "coral", alpha = 0.4)
+              fill = "gray", alpha = 0.4)
 
 # Plot crash by month
 g2 <- ggplot(month, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2, color='coral') + geom_line(size=1, color='coral') +
+  geom_point(size=2) + geom_line(size=1) +
   labs(x = "Month of year", y = "# of crashes") +
   geom_ribbon(data = month, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "coral", alpha = 0.4)
+              fill = "gray", alpha = 0.4)
 
 # Plot crash by hour
 g3 <- ggplot(hour, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2, color='coral') + geom_line(size=1, color='coral') +
+  geom_point(size=2) + geom_line(size=1) +
   labs(x = "Time of day", y = "# of crashes") +
   geom_ribbon(data = hour, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "coral", alpha = 0.4) +
+              fill = "gray", alpha = 0.4) +
   scale_x_discrete(limits=hour$var_level,breaks=hour$var_level[seq(1,length(hour$var_level),by=2)])
 
 h <- 3.5
@@ -86,7 +84,7 @@ G <- ggarrange(g2, g1, g3,
                labels = c("a", "b", "c"),
                ncol = 3, nrow = 1)
 ggsave(filename = "figures/crash_time.png", plot=G,
-       width = 3 * h, height = h, unit = "in", dpi = 300)
+       width = 4 * h, height = h, unit = "in", dpi = 300)
 
 # Plot the matrix of day x hour
 g4 <- ggplot(hour_day, aes(Hour, Day)) +
