@@ -11,6 +11,9 @@ library(htmlwidgets)
 library(webshot)
 library(lattice)
 library(dplyr)
+library(igraph)
+library(Cairo)
+
 
 # Load data
 d_bn <- read.csv("data/data_s4.csv", header = TRUE, check.names = FALSE)
@@ -43,7 +46,19 @@ b1 <- rbind(b1, b2)
 bn.tb <- tabu(d_bn, blacklist = b1)
 bn.tb
 
-## Visualise the learned bn
+## Find nodes' conditional dependency tables
+fit <- bn.fit(bn.tb, d_bn)
+
+## Write conditional dependencies out
+write.table(fit$`Crash causation`$prob, file="data/Crash causation.csv", sep = ",", col.names=NA)
+
+# Visualisation
+arc_strengths <- arc.strength(bn.tb, d_bn)
+arc_strengths <- arc_strengths %>%
+  mutate(strength = abs(strength)) %>%
+  mutate(strength = strength/max(strength) * 3)
+
+## Visualise the learned bn - dynamic view
 plot<- viewer(bn.tb,
      bayesianNetwork.width = "100%",
      bayesianNetwork.height = "80vh",
@@ -55,9 +70,39 @@ plot
 saveWidget(plot, "bn_structure.html")
 webshot("bn_structure.html", "bn_structure.png")
 
-## Find nodes' conditional dependency tables
-fit <- bn.fit(bn.tb, d_bn)
+## Visualise the learned bn - static view
+nodes <- names(d_bn)
+net <- graph_from_data_frame(d=arc_strengths[,c('from', 'to')], vertices=nodes, directed=T)
+v_col_list <- c('#6699ff', "gray60", '#6699ff', "gray60",
+                "gray60", "gray60", '#6699ff', "gray60",
+                "gray60", "gray60", "gray60", "gray60")
+V(net)$color <- v_col_list
 
-## Write conditional dependencies out
-write.table(fit$`Crash causation`$prob, file="data/Crash causation.csv", sep = ",", col.names=NA)
+e_col_list <- c('gray60', "gray60", 'gray60', "#6699ff",
+                "gray60", "gray60", 'gray60', "#6699ff",
+                "gray60", "gray60", "gray60", "gray60",
+                "gray60", "gray60", "gray60", "gray60", "gray60")
+E(net)$color <- e_col_list
+tkid <- tkplot(net) #tkid is the id of the tkplot that will open
+l <- tkplot.getcoords(tkid)
+V(net)$label <- V(net)$name
 
+Cairo::Cairo(
+  16, #length
+  14, #width
+  file = paste("figures/crash_causation_bn", ".png", sep = ""),
+  type = "png", #tiff
+  bg = "white", #white or transparent depending on your requirement
+  dpi = 300,
+  units = "cm" #you can change to pixels etc
+)
+
+plot(0, type="n", ann=FALSE, axes=FALSE, xlim=extendrange(l[,1]),
+     ylim=extendrange(l[,2]))
+
+plot(net, vertex.shape="rectangle", vertex.label=V(net)$media, rescale=FALSE, add=TRUE,
+     vertex.label.font=2, vertex.label.color=V(net)$color,
+     vertex.color='white', vertex.size=(strwidth(V(net)$label) + strwidth("oo")) * 70,
+     vertex.size2=strheight("I") * 2 * 100, vertex.frame.color = 'white',
+     vertex.label.cex=.7, edge.color=E(net)$color, layout=l) #p is your graph object
+dev.off()
