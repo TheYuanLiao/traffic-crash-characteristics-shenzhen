@@ -10,12 +10,16 @@ library(dplyr)
 library(lubridate)
 
 # Load data and drop duplicated crahes
-df <- read.csv('data/data_s1.csv')
-df <- select(df, c('id', 'time'))
+df <- read.csv('data/data_s3.csv')
+df <- select(df, c('id', 'injs_num', 'deaths_num'))
+df2 <- read.csv('data/data_s1.csv')
+df2 <- select(df2, c('id', 'time'))
+df <- merge(df, df2, by='id')
 df <- df[!duplicated(df), ]
 
 # Convert time into month, weekday, and hour
 df <- df %>%
+  mutate(injs_deaths = injs_num + deaths_num) %>%
   mutate(time = ymd_hms(time)) %>%
   mutate(Month = month(time),
          Year = year(time),
@@ -26,65 +30,106 @@ df <- df %>%
 # Calculate max and min for each Month, Day, and Hour
 month <- df %>%
   group_by(Month, Year) %>%
-  summarise(Crash=n()) %>%
+  summarise(Crash=n(), Injuries_and_deaths=sum(injs_deaths)) %>%
   group_by(Month) %>%
   summarise(Crash_min=min(Crash),
             Crash_max=max(Crash),
-            Crash_m=mean(Crash))
+            Crash_m=mean(Crash),
+            Injuries_and_deaths_min=min(Injuries_and_deaths),
+            Injuries_and_deaths_max=max(Injuries_and_deaths),
+            Injuries_and_deaths_m=mean(Injuries_and_deaths),
+  )
 
 day <- df %>%
   group_by(Day, Year) %>%
-  summarise(Crash=n()) %>%
+  summarise(Crash=n(), Injuries_and_deaths=sum(injs_deaths)) %>%
   group_by(Day) %>%
   summarise(Crash_min=min(Crash),
             Crash_max=max(Crash),
-            Crash_m=mean(Crash))
+            Crash_m=mean(Crash),
+            Injuries_and_deaths_min=min(Injuries_and_deaths),
+            Injuries_and_deaths_max=max(Injuries_and_deaths),
+            Injuries_and_deaths_m=mean(Injuries_and_deaths),
+  )
 
 hour <- df %>%
   group_by(Hour, Year) %>%
-  summarise(Crash=n()) %>%
+  summarise(Crash=n(), Injuries_and_deaths=sum(injs_deaths)) %>%
   group_by(Hour) %>%
   summarise(Crash_min=min(Crash),
             Crash_max=max(Crash),
-            Crash_m=mean(Crash))
-
-colnames(month) <- c("var_level", "Crash_min", "Crash_max", "Crash_m")
-colnames(day) <- c("var_level", "Crash_min", "Crash_max", "Crash_m")
-colnames(hour) <- c("var_level", "Crash_min", "Crash_max", "Crash_m")
+            Crash_m=mean(Crash),
+            Injuries_and_deaths_min=min(Injuries_and_deaths),
+            Injuries_and_deaths_max=max(Injuries_and_deaths),
+            Injuries_and_deaths_m=mean(Injuries_and_deaths),
+  )
+var.list <- c("var_level", "Crash_min", "Crash_max", "Crash_m",
+              "Injuries_and_deaths_min", "Injuries_and_deaths_max", "Injuries_and_deaths_m")
+colnames(month) <- var.list
+colnames(day) <- var.list
+colnames(hour) <- var.list
 
 # Prepare the matrix of day x hour
 hour_day <- with(df, table(Day, Hour))
 hour_day <- data.frame(hour_day)
 
 # Plot crash by day
-g1 <- ggplot(day, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2) +
-  geom_line(size=1) +
-  labs(x = "Day of week", y = "# of crashes") +
-  geom_ribbon(data = day, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "gray", alpha = 0.4)
+g1 <- ggplot(data = day, aes(x=as.factor(var_level))) + theme_minimal() +
+  geom_point(aes(y=Crash_m, group=1, color='# of crashes'), size=2) +
+  geom_line(aes(y=Crash_m, group=1, color='# of crashes'), size=1) +
+  geom_point(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=2) +
+  geom_line(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=1) +
+
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Crash_min, ymax = Crash_max, group = 1, fill='# of crashes'), alpha = 0.4) +
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Injuries_and_deaths_min, ymax = Injuries_and_deaths_max,
+                  group = 1, fill='# of injureis and deaths'), alpha = 0.4) +
+
+  scale_color_manual("", values = c('#3c40c6', '#05c46b')) +
+  scale_fill_manual("", values = c('#3c40c6', '#05c46b')) +
+  theme(legend.position = c(0.7, 0.07)) +
+  labs(x = "Day of week", y = "Count")
+
 
 # Plot crash by month
-g2 <- ggplot(month, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2) + geom_line(size=1) +
-  labs(x = "Month of year", y = "# of crashes") +
-  geom_ribbon(data = month, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "gray", alpha = 0.4)
+g2 <- ggplot(data = month, aes(x=as.factor(var_level))) + theme_minimal() +
+  geom_point(aes(y=Crash_m, group=1, color='# of crashes'), size=2) +
+  geom_line(aes(y=Crash_m, group=1, color='# of crashes'), size=1) +
+  geom_point(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=2) +
+  geom_line(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=1) +
+
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Crash_min, ymax = Crash_max, group = 1, fill='# of crashes'), alpha = 0.4) +
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Injuries_and_deaths_min, ymax = Injuries_and_deaths_max,
+                  group = 1, fill='# of injureis and deaths'), alpha = 0.4) +
+
+  scale_color_manual("", values = c('#3c40c6', '#05c46b')) +
+  scale_fill_manual("", values = c('#3c40c6', '#05c46b')) +
+  theme(legend.position = c(0.7, 0.07)) +
+  labs(x = "Month of year", y = "Count")
 
 # Plot crash by hour
-g3 <- ggplot(hour, aes(x=as.factor(var_level), y=Crash_m, group=1)) + theme_minimal() +
-  geom_point(size=2) + geom_line(size=1) +
-  labs(x = "Time of day", y = "# of crashes") +
-  geom_ribbon(data = hour, aes(x = as.factor(var_level), ymin = Crash_min, ymax = Crash_max),
-              fill = "gray", alpha = 0.4) +
-  scale_x_discrete(limits=hour$var_level,breaks=hour$var_level[seq(1,length(hour$var_level),by=2)])
+g3 <- ggplot(data = hour, aes(x=as.factor(var_level))) + theme_minimal() +
+  geom_point(aes(y=Crash_m, group=1, color='# of crashes'), size=2) +
+  geom_line(aes(y=Crash_m, group=1, color='# of crashes'), size=1) +
+  geom_point(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=2) +
+  geom_line(aes(y=Injuries_and_deaths_m*1, group=1, color='# of injureis and deaths'), size=1) +
 
-h <- 3.5
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Crash_min, ymax = Crash_max, group = 1, fill='# of crashes'), alpha = 0.4) +
+  geom_ribbon(aes(x=as.factor(var_level), ymin = Injuries_and_deaths_min, ymax = Injuries_and_deaths_max,
+                  group = 1, fill='# of injureis and deaths'), alpha = 0.4) +
+
+  scale_color_manual("", values = c('#3c40c6', '#05c46b')) +
+  scale_fill_manual("", values = c('#3c40c6', '#05c46b')) +
+  theme(legend.position = c(0.7, 0.07)) +
+  scale_x_discrete(limits=hour$var_level,breaks=hour$var_level[seq(1,length(hour$var_level),by=2)]) +
+  labs(x = "Time of day", y = "Count")
+
+
+h <- 4
 G <- ggarrange(g2, g1, g3,
                labels = c("a", "b", "c"),
-               ncol = 3, nrow = 1)
+               ncol = 3, nrow = 1, common.legend = TRUE, legend="bottom")
 ggsave(filename = "figures/crash_time.png", plot=G,
-       width = 4 * h, height = h, unit = "in", dpi = 300)
+       width = 12, height = h, unit = "in", dpi = 300)
 
 # Plot the matrix of day x hour
 g4 <- ggplot(hour_day, aes(Hour, Day)) +
