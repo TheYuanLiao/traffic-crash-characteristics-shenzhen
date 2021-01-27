@@ -8,6 +8,7 @@ library(ggplot2)
 library(ggpubr)
 library(dplyr)
 library(lubridate)
+library(formattable)
 
 # Load data and drop duplicated crahes
 df <- read.csv('data/data_s3.csv')
@@ -86,9 +87,10 @@ g1 <- ggplot(data = day, aes(x=as.factor(var_level))) + theme_minimal() +
 
   scale_color_manual("", values = c('#3c40c6', '#05c46b')) +
   scale_fill_manual("", values = c('#3c40c6', '#05c46b')) +
+  scale_y_continuous(breaks = c(7000, 8000, 9000, 10000, 11000, 12000), labels = c('7000', '8000', '9000',
+                                                                                   '10,000', '11,000', '12,000')) +
   theme(legend.position = c(0.7, 0.07)) +
   labs(x = "Day of week", y = "Count")
-
 
 # Plot crash by month
 g2 <- ggplot(data = month, aes(x=as.factor(var_level))) + theme_minimal() +

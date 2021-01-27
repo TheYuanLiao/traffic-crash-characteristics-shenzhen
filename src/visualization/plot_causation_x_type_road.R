@@ -24,7 +24,8 @@ df2$`Crash type` <- factor(df2$`Crash type`, levels=unlist(lapply(1:13, function
 # Plot the matrix of crash causation x road type
 g1 <- ggplot(df, aes(x=`Road type`, y=`Crash causation`)) +
   geom_tile(aes(fill = `Crash number`), colour = "white") +
-  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10') +
+  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10',
+                       label = scales::comma) +
   labs(y = "Crash causation", x = "Road type") +
   scale_x_discrete(position = "top") +
   theme_minimal() +
@@ -34,7 +35,8 @@ g1 <- ggplot(df, aes(x=`Road type`, y=`Crash causation`)) +
 # Plot the matrix of crash causation x crash type
 g2 <- ggplot(df2, aes(x=`Crash type`, y=`Crash causation`)) +
   geom_tile(aes(fill = `Crash number`), colour = "white") +
-  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10') +
+  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10',
+                       label = scales::comma) +
   labs(y = "Crash causation", x = "Crash type") +
   scale_x_discrete(position = "top") +
   theme_minimal() +

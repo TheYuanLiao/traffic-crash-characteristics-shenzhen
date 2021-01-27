@@ -17,7 +17,8 @@ df$`Crash type` <- factor(df$`Crash type`, levels=unlist(lapply(1:13, function(x
 # Plot the matrix of crash type x road type
 g1 <- ggplot(df, aes(y=`Road type`, x=`Crash type`)) +
   geom_tile(aes(fill = `Crash number`), colour = "white") +
-  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10') +
+  scale_fill_distiller(name = "# of crashes", palette = "Spectral", direction = -1, trans = 'log10',
+                       label = scales::comma) +
   labs(x = "Crash type", y = "Road type") +
   scale_x_discrete(position = "top") +
   theme_minimal() +
